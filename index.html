@@ -56,7 +56,7 @@
     <!-- NAVIGATION TABS -->
     <nav class="bg-slate-900 border-b border-slate-800 px-6 py-3">
         <div class="max-w-7xl mx-auto flex gap-3 overflow-x-auto text-xs font-semibold">
-            <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn bg-gold-500 text-udom-navy px-4 py-2 rounded-lg flex items-center gap-2 transition">
+            <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn bg-gold-500 text-udom-navy px-4 py-2 rounded-lg flex items-center gap-2 transition font-bold">
                 <i class="fa-solid fa-chart-line"></i> Dashboard & Viongozi
             </button>
             <button onclick="switchTab('tab-cases')" id="btn-tab-cases" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
@@ -504,18 +504,20 @@
             document.getElementById('btn-' + tabId).className = "tab-btn bg-gold-500 text-udom-navy px-4 py-2 rounded-lg flex items-center gap-2 transition font-bold";
         }
 
-        // DATABASE CONNECTION CHECK
+        // DATABASE CONNECTION CHECK (FIXED)
         async function checkConnection() {
             try {
-                const { data, error } = await supabase.from('leaders').select('count', { count: 'exact' });
+                const { data, error } = await supabase.from('leaders').select('id').limit(1);
                 if (error) throw error;
+                
                 const statusDiv = document.getElementById('connection-status');
                 statusDiv.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full flex items-center gap-2";
                 statusDiv.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Database Imeunganishwa (Live)`;
             } catch (err) {
+                console.error("Supabase Error:", err);
                 const statusDiv = document.getElementById('connection-status');
                 statusDiv.className = "text-xs bg-rose-500/20 text-rose-300 border border-rose-500/30 px-3 py-1 rounded-full flex items-center gap-2";
-                statusDiv.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Hitilafu ya Connection`;
+                statusDiv.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Hitilafu: ${err.message || 'Connection Error'}`;
             }
         }
 
@@ -526,7 +528,7 @@
             if (data) {
                 currentLeadersList = data;
                 document.getElementById('count-leaders').innerText = data.length;
-                tbody.innerHTML = data.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Hakuna kiongozi.</td></tr>` :
+                tbody.innerHTML = data.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Hakuna kiongozi aliyesajiliwa bado.</td></tr>` :
                 data.map(l => `
                     <tr class="hover:bg-slate-800/50">
                         <td class="p-3 font-semibold text-white">${l.full_name}</td>
@@ -549,9 +551,11 @@
                 secretariat_code: document.getElementById('leader-secretariat').value
             }]);
             if (!error) {
-                alert("Kiongozi amesajiliwa!");
+                alert("Kiongozi amesajiliwa kikamilifu!");
                 document.getElementById('add-leader-form').reset();
                 loadLeaders();
+            } else {
+                alert("Hitilafu: " + error.message);
             }
         });
 
@@ -589,6 +593,8 @@
                 alert("Kesi imesajiliwa!");
                 document.getElementById('add-case-form').reset();
                 loadCases();
+            } else {
+                alert("Hitilafu: " + error.message);
             }
         });
 
@@ -601,7 +607,7 @@
             if (data) {
                 document.getElementById('count-activities').innerText = data.length;
                 if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Hakuna shughuli.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Hakuna shughuli iliyosajiliwa.</td></tr>`;
                     printBody.innerHTML = `<tr><td colspan="6" class="p-2 text-center">Hakuna data.</td></tr>`;
                     return;
                 }
@@ -642,6 +648,8 @@
                 alert("Shughuli imesajiliwa!");
                 document.getElementById('add-activity-form').reset();
                 loadActivities();
+            } else {
+                alert("Hitilafu: " + error.message);
             }
         });
 
@@ -671,6 +679,8 @@
             if (!error) {
                 alert("Tangazo limehifadhiwa!");
                 loadAnnouncementsCount();
+            } else {
+                alert("Hitilafu: " + error.message);
             }
         });
 
@@ -699,7 +709,7 @@
                         <p class="text-[10px] text-gold-400">${l.title} (${l.secretariat_code})</p>
                     </div>
                     <label class="flex items-center gap-2 cursor-pointer bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-xs hover:border-emerald-500">
-                        <input type="checkbox" id="attend-${index}" data-name="${l.full_name}" data-title="${l.title}" class="w-4 h-4 accent-emerald-500 rounded">
+                        <input type="checkbox" id="attend-${index}" class="w-4 h-4 accent-emerald-500 rounded">
                         <span class="text-emerald-400 font-semibold">Amehudhuria</span>
                     </label>
                 </div>
