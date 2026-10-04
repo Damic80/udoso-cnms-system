@@ -29,8 +29,8 @@
     <style>
         @media print {
             body * { visibility: hidden; }
-            #printable-report, #printable-report * { visibility: visible; }
-            #printable-report { position: absolute; left: 0; top: 0; width: 100%; color: black !important; background: white !important; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; color: black !important; background: white !important; }
         }
     </style>
 </head>
@@ -67,6 +67,9 @@
             </button>
             <button onclick="switchTab('tab-reports')" id="btn-tab-reports" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
                 <i class="fa-solid fa-file-contract"></i> Ripoti za Mwezi
+            </button>
+            <button onclick="switchTab('tab-attendance')" id="btn-tab-attendance" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                <i class="fa-solid fa-clipboard-user"></i> Mahudhurio ya Mikutano
             </button>
         </div>
     </nav>
@@ -327,7 +330,6 @@
 
         <!-- ================= TAB 4: RIPOTI ZA MWEZI ================= -->
         <div id="tab-reports" class="tab-content hidden space-y-8">
-            <!-- FORM YA KUINGIZA SHUGHULI ZA MWEZI -->
             <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
                 <h2 class="font-cinzel text-lg text-emerald-400 font-bold flex items-center gap-2">
                     <i class="fa-solid fa-calendar-plus"></i> Sajili Shughuli / Kazi ya Sekretarieti ya Mwezi
@@ -363,7 +365,7 @@
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-xs text-slate-400 block mb-1">Maelezo na Mafanikio</label>
-                        <input type="text" id="activity-description" required placeholder="Wanafunzi 150 walisaidiwa kupata rufaa..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500">
+                        <input type="text" id="activity-description" required placeholder="Wanafunzi 150 walisaidiwa..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-emerald-500">
                     </div>
                     <div class="md:col-span-3">
                         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-xs transition">
@@ -373,7 +375,6 @@
                 </form>
             </section>
 
-            <!-- ORODHA YA SHUGHULI & PRINT PREVIEW -->
             <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-6">
                 <div class="flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 pb-4">
                     <h2 class="font-cinzel text-lg text-emerald-400 font-bold flex items-center gap-2">
@@ -384,7 +385,6 @@
                     </button>
                 </div>
 
-                <!-- JEDWALI LA DIGITALI -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
@@ -402,8 +402,8 @@
                     </table>
                 </div>
 
-                <!-- PRINTABLE OFFICIAL REPORT CONTAINER (Inaonekana ukiprint au kupakua PDF) -->
-                <div id="printable-report" class="hidden print:block p-8 bg-white text-black space-y-6 font-serif">
+                <!-- PRINTABLE REPORT -->
+                <div id="printable-area" class="hidden print:block p-8 bg-white text-black space-y-6 font-serif">
                     <div class="text-center border-b-2 border-black pb-4 space-y-1">
                         <h1 class="font-bold text-base uppercase">UNIVERSITY OF DODOMA STUDENT ORGANIZATION (UDOSO)</h1>
                         <h2 class="font-semibold text-sm">COLLEGE OF NATURAL AND MATHEMATICAL SCIENCES (CNMS)</h2>
@@ -421,9 +421,7 @@
                                 <th class="border border-black p-2">Maelezo</th>
                             </tr>
                         </thead>
-                        <tbody id="print-table-body">
-                            <!-- Populated dynamically -->
-                        </tbody>
+                        <tbody id="print-table-body"></tbody>
                     </table>
 
                     <div class="pt-12 flex justify-between text-xs">
@@ -442,14 +440,48 @@
             </section>
         </div>
 
+        <!-- ================= TAB 5: MAHUDHURIO YA MIKUTANO (ATTENDANCE SHEET) ================= -->
+        <div id="tab-attendance" class="tab-content hidden space-y-8">
+            <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-6">
+                <h2 class="font-cinzel text-lg text-blue-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check"></i> Fomu ya Mahudhurio ya Mkutano wa Viongozi
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Jina la Mkutano</label>
+                        <input type="text" id="meeting-title" placeholder="Mkutano wa Mwezi wa Sekretarieti" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Tarehe ya Mkutano</label>
+                        <input type="date" id="meeting-date" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-xs text-slate-400 font-semibold">Weka Tiki (Check) kwa Viongozi Waliohudhuria Mkutano:</p>
+                    <div id="attendance-list-container" class="space-y-2 max-h-96 overflow-y-auto pr-2">
+                        <p class="text-xs text-slate-500 italic p-4">Inapakia orodha ya viongozi...</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="saveAttendance()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Hifadhi Mahudhurio Kwenye Database
+                    </button>
+                </div>
+            </section>
+        </div>
+
     </main>
 
-    <!-- SCRIPT YA SUPABASE & LOGIC ALL IN ONE -->
+    <!-- SCRIPT YA SUPABASE & LOGIC YA MFUMO -->
     <script>
         const SUPABASE_URL = "https://fimynskqdunwtenwzemx.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpbXluc2txZHVud3Rlbnd6ZW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMDUzMjAsImV4cCI6MjEwNjY4MTMyMH0.I4RNspFwbQvX0YF69kQS-1XJltI6fnAnr9ynGUbzV_M";
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentLeadersList = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             checkConnection();
@@ -458,6 +490,7 @@
             loadActivities();
             loadAnnouncementsCount();
             document.getElementById('preview-date').innerText = new Date().toLocaleDateString('sw-TZ');
+            document.getElementById('meeting-date').valueAsDate = new Date();
         });
 
         // TAB SWITCHER
@@ -486,11 +519,12 @@
             }
         }
 
-        // 1. LEADERS
+        // 1. LEADERS LOGIC
         async function loadLeaders() {
             const { data } = await supabase.from('leaders').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('leaders-table-body');
             if (data) {
+                currentLeadersList = data;
                 document.getElementById('count-leaders').innerText = data.length;
                 tbody.innerHTML = data.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Hakuna kiongozi.</td></tr>` :
                 data.map(l => `
@@ -501,6 +535,8 @@
                         <td class="p-3">${l.secretariat_code}</td>
                     </tr>
                 `).join('');
+
+                renderAttendanceForm(data);
             }
         }
 
@@ -519,7 +555,7 @@
             }
         });
 
-        // 2. CASES
+        // 2. CASES LOGIC
         async function loadCases() {
             const { data } = await supabase.from('student_cases').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('cases-table-body');
@@ -556,7 +592,7 @@
             }
         });
 
-        // 3. MONTHLY ACTIVITIES & REPORT GENERATOR
+        // 3. MONTHLY ACTIVITIES
         async function loadActivities() {
             const { data } = await supabase.from('monthly_activities').select('*').order('activity_date', { ascending: false });
             const tbody = document.getElementById('activities-table-body');
@@ -564,9 +600,8 @@
 
             if (data) {
                 document.getElementById('count-activities').innerText = data.length;
-                
                 if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Hakuna shughuli iliyosajiliwa.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Hakuna shughuli.</td></tr>`;
                     printBody.innerHTML = `<tr><td colspan="6" class="p-2 text-center">Hakuna data.</td></tr>`;
                     return;
                 }
@@ -603,13 +638,10 @@
                 status: document.getElementById('activity-status').value,
                 description: document.getElementById('activity-description').value
             }]);
-
             if (!error) {
-                alert("Shughuli ya mwezi imesajiliwa!");
+                alert("Shughuli imesajiliwa!");
                 document.getElementById('add-activity-form').reset();
                 loadActivities();
-            } else {
-                alert("Hitilafu: " + error.message);
             }
         });
 
@@ -650,6 +682,57 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
+        }
+
+        // 5. ATTENDANCE LOGIC
+        function renderAttendanceForm(leaders) {
+            const container = document.getElementById('attendance-list-container');
+            if (!leaders || leaders.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 italic p-4">Hakuna viongozi waliokwisha sajiliwa. Tafadhali wasajili kwanza kwenye Dashboard.</p>`;
+                return;
+            }
+
+            container.innerHTML = leaders.map((l, index) => `
+                <div class="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-lg">
+                    <div>
+                        <p class="text-xs font-bold text-white">${l.full_name}</p>
+                        <p class="text-[10px] text-gold-400">${l.title} (${l.secretariat_code})</p>
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-xs hover:border-emerald-500">
+                        <input type="checkbox" id="attend-${index}" data-name="${l.full_name}" data-title="${l.title}" class="w-4 h-4 accent-emerald-500 rounded">
+                        <span class="text-emerald-400 font-semibold">Amehudhuria</span>
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        async function saveAttendance() {
+            const title = document.getElementById('meeting-title').value;
+            const date = document.getElementById('meeting-date').value;
+
+            if (!title || !date) {
+                alert("Tafadhali jaza Jina la Mkutano na Tarehe kwanza!");
+                return;
+            }
+
+            const records = currentLeadersList.map((l, idx) => {
+                const isChecked = document.getElementById(`attend-${idx}`).checked;
+                return {
+                    meeting_title: title,
+                    meeting_date: date,
+                    leader_name: l.full_name,
+                    leader_title: l.title,
+                    status: isChecked ? 'PRESENT' : 'ABSENT'
+                };
+            });
+
+            const { error } = await supabase.from('attendance').insert(records);
+            if (!error) {
+                alert("Mahudhurio ya mkutano yamehifadhiwa kikamilifu!");
+                document.getElementById('meeting-title').value = '';
+            } else {
+                alert("Hitilafu: " + error.message);
+            }
         }
     </script>
 </body>
