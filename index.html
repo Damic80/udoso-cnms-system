@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UDOSO CNMS - Executive System</title>
     
-    <!-- Tailwind CSS & FontAwesome -->
+    <!-- Tailwind CSS, FontAwesome & html2canvas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -28,10 +27,10 @@
         }
     </script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-montserrat min-h-screen">
+<body class="bg-slate-950 text-slate-100 font-montserrat min-h-screen pb-12">
 
-    <!-- BARAA YA JUU (HEADER) -->
-    <header class="bg-udom-navy border-b border-gold-500/30 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <!-- HEADER -->
+    <header class="bg-udom-navy border-b border-gold-500/30 px-6 py-4 flex flex-wrap justify-between items-center sticky top-0 z-50 gap-4">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-full bg-gold-500 text-udom-navy font-bold flex items-center justify-center text-xl shadow-md">
                 <i class="fa-solid fa-building-columns"></i>
@@ -41,113 +40,298 @@
                 <p class="text-xs text-gold-400">Ofisi ya Gavana na Sekretarieti Mtandaoni</p>
             </div>
         </div>
+        
         <div id="connection-status" class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Inajiunga na Database...
         </div>
     </header>
 
+    <!-- NAVIGATION TABS -->
+    <nav class="bg-slate-900 border-b border-slate-800 px-6 py-3">
+        <div class="max-w-7xl mx-auto flex gap-4 overflow-x-auto text-xs font-semibold">
+            <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn bg-gold-500 text-udom-navy px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                <i class="fa-solid fa-chart-line"></i> Dashboard & Viongozi
+            </button>
+            <button onclick="switchTab('tab-cases')" id="btn-tab-cases" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                <i class="fa-solid fa-scale-balanced"></i> Kesi za Wanafunzi
+            </button>
+            <button onclick="switchTab('tab-notices')" id="btn-tab-notices" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                <i class="fa-solid fa-bullhorn"></i> Matangazo & Poster Maker
+            </button>
+        </div>
+    </nav>
+
     <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
 
-        <!-- DASHBOARD SUMMARY CARDS -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg text-2xl"><i class="fa-solid fa-users-gear"></i></div>
-                <div>
-                    <p class="text-xs text-slate-400">Viongozi Waliosajiliwa</p>
-                    <h3 id="count-leaders" class="text-xl font-bold text-white">0</h3>
+        <!-- ================= TAB 1: DASHBOARD & VIONGOZI ================= -->
+        <div id="tab-dashboard" class="tab-content space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
+                    <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg text-2xl"><i class="fa-solid fa-users-gear"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-400">Viongozi Waliosajiliwa</p>
+                        <h3 id="count-leaders" class="text-xl font-bold text-white">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg text-2xl"><i class="fa-solid fa-list-check"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-400">Matukio ya Mwezi</p>
+                        <h3 id="count-activities" class="text-xl font-bold text-white">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-lg text-2xl"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-400">Kesi za Wanafunzi</p>
+                        <h3 id="count-cases" class="text-xl font-bold text-white">0</h3>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
+                    <div class="p-3 bg-gold-500/10 text-gold-400 rounded-lg text-2xl"><i class="fa-solid fa-bullhorn"></i></div>
+                    <div>
+                        <p class="text-xs text-slate-400">Matangazo Yaliyotolewa</p>
+                        <h3 id="count-announcements" class="text-xl font-bold text-white">0</h3>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg text-2xl"><i class="fa-solid fa-list-check"></i></div>
-                <div>
-                    <p class="text-xs text-slate-400">Matukio ya Mwezi</p>
-                    <h3 id="count-activities" class="text-xl font-bold text-white">0</h3>
-                </div>
-            </div>
+            <!-- FORM YA VIONGOZI -->
+            <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <h2 class="font-cinzel text-lg text-gold-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i> Usajili wa Kiongozi Mpya
+                </h2>
+                <form id="add-leader-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Majina Kamili</label>
+                        <input type="text" id="leader-name" required placeholder="Michael Fabian Jibulika" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Namba ya Simu</label>
+                        <input type="text" id="leader-phone" required placeholder="0774303194" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Cheo cha Kiongozi</label>
+                        <input type="text" id="leader-title" required placeholder="Katibu Mkuu Mtendaji" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Sekretarieti / Ofisi</label>
+                        <select id="leader-secretariat" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                            <option value="GOVERNOR">Ofisi ya Gavana</option>
+                            <option value="EDUCATION">Elimu na Uvumbuzi</option>
+                            <option value="FINANCE">Fedha na Mikopo</option>
+                            <option value="SPORTS">Michezo, Habari na Mawasiliano</option>
+                            <option value="HEALTH">Afya, Chakula na Jinsia</option>
+                            <option value="CONSTITUTION">Katiba, Sheria na Utawala Bora</option>
+                            <option value="DEFENSE">Ulinzi na Mazingira</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 flex items-end">
+                        <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 text-udom-navy font-bold py-2.5 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-save"></i> Hifadhi Kiongozi
+                        </button>
+                    </div>
+                </form>
+            </section>
 
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-                <div class="p-3 bg-rose-500/10 text-rose-400 rounded-lg text-2xl"><i class="fa-solid fa-scale-balanced"></i></div>
-                <div>
-                    <p class="text-xs text-slate-400">Kesi za Wanafunzi</p>
-                    <h3 id="count-cases" class="text-xl font-bold text-white">0</h3>
+            <!-- JEDWALI LA VIONGOZI -->
+            <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <h2 class="font-cinzel text-lg text-gold-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> Orodha ya Viongozi Waliosajiliwa
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                                <th class="p-3">JINA KAMILI</th>
+                                <th class="p-3">SIMU</th>
+                                <th class="p-3">CHEO</th>
+                                <th class="p-3">SEKRETARIETI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaders-table-body" class="divide-y divide-slate-800 text-slate-300">
+                            <tr><td colspan="4" class="p-4 text-center text-slate-500">Inapakia...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center space-x-4">
-                <div class="p-3 bg-gold-500/10 text-gold-400 rounded-lg text-2xl"><i class="fa-solid fa-bullhorn"></i></div>
-                <div>
-                    <p class="text-xs text-slate-400">Matangazo Yaliyotolewa</p>
-                    <h3 id="count-announcements" class="text-xl font-bold text-white">0</h3>
-                </div>
-            </div>
+            </section>
         </div>
 
-        <!-- FORM YA KUSAJILI KIONGOZI -->
-        <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
-            <h2 class="font-cinzel text-lg text-gold-400 font-bold flex items-center gap-2">
-                <i class="fa-solid fa-user-plus"></i> Usajili wa Kiongozi Mpya wa CNMS
-            </h2>
-            <form id="add-leader-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="text-xs text-slate-400 block mb-1">Majina Kamili</label>
-                    <input type="text" id="leader-name" required placeholder="Mfano: Michael Fabian Jibulika" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:border-gold-500 outline-none">
-                </div>
-                <div>
-                    <label class="text-xs text-slate-400 block mb-1">Namba ya Simu</label>
-                    <input type="text" id="leader-phone" required placeholder="0774303194" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:border-gold-500 outline-none">
-                </div>
-                <div>
-                    <label class="text-xs text-slate-400 block mb-1">Cheo cha Kiongozi</label>
-                    <input type="text" id="leader-title" required placeholder="Katibu Mkuu Mtendaji" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:border-gold-500 outline-none">
-                </div>
-                <div>
-                    <label class="text-xs text-slate-400 block mb-1">Sekretarieti / Ofisi</label>
-                    <select id="leader-secretariat" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:border-gold-500 outline-none">
-                        <option value="GOVERNOR">Ofisi ya Gavana</option>
-                        <option value="EDUCATION">Elimu na Uvumbuzi</option>
-                        <option value="FINANCE">Fedha na Mikopo</option>
-                        <option value="SPORTS">Michezo, Habari na Mawasiliano</option>
-                        <option value="HEALTH">Afya, Chakula na Jinsia</option>
-                        <option value="CONSTITUTION">Katiba, Sheria na Utawala Bora</option>
-                        <option value="DEFENSE">Ulinzi na Mazingira</option>
-                    </select>
-                </div>
-                <div class="md:col-span-2 flex items-end">
-                    <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 text-udom-navy font-bold py-2.5 rounded-lg text-xs transition">
-                        <i class="fa-solid fa-save"></i> Hifadhi Kiongozi Kwenye Database
-                    </button>
-                </div>
-            </form>
-        </section>
+        <!-- ================= TAB 2: KESI ZA WANAFUNZI ================= -->
+        <div id="tab-cases" class="tab-content hidden space-y-8">
+            <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <h2 class="font-cinzel text-lg text-rose-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-folder-plus"></i> Sajili Kesi Mpya ya Mwanafunzi
+                </h2>
+                <form id="add-case-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Jina la Mwanafunzi</label>
+                        <input type="text" id="case-student-name" required placeholder="Amina Juma" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-rose-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Registration Number</label>
+                        <input type="text" id="case-reg-no" required placeholder="T/UDO/2023/0123" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-rose-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Aina ya Kero/Kesi</label>
+                        <select id="case-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-rose-500">
+                            <option value="ACADEMIC">Masomo / Academic</option>
+                            <option value="LOAN">Mikopo (HESLB)</option>
+                            <option value="ACCOMMODATION">Bweni / Malazi</option>
+                            <option value="DISCIPLINARY">Nidhamu</option>
+                            <option value="HEALTH">Afya</option>
+                            <option value="OTHER">Mengineyo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Idara / Department</label>
+                        <input type="text" id="case-department" required placeholder="Computer Science" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-rose-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Hali ya Kesi (Status)</label>
+                        <select id="case-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-rose-500">
+                            <option value="Pending">Inashughulikiwa (Pending)</option>
+                            <option value="Resolved">Imetatuliwa (Resolved)</option>
+                            <option value="Escalated">Imepelekwa Ngazi ya Juu</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="text-xs text-slate-400 block mb-1">Maelezo ya Kesi</label>
+                        <textarea id="case-description" rows="3" required placeholder="Andika maelezo kwa ufupi kuhusu changamoto au matatizo ya mwanafunzi..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-rose-500"></textarea>
+                    </div>
+                    <div class="md:col-span-3">
+                        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-file-export"></i> Hifadhi Kesi Kwenye Database
+                        </button>
+                    </div>
+                </form>
+            </section>
 
-        <!-- ORODHA YA VIONGOZI -->
-        <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
-            <h2 class="font-cinzel text-lg text-gold-400 font-bold flex items-center gap-2">
-                <i class="fa-solid fa-users"></i> Orodha ya Viongozi Waliosajiliwa
-            </h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="bg-slate-950 text-slate-400 border-b border-slate-800">
-                            <th class="p-3">JINA KAMILI</th>
-                            <th class="p-3">SIMU</th>
-                            <th class="p-3">CHEO</th>
-                            <th class="p-3">SEKRETARIETI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaders-table-body" class="divide-y divide-slate-800 text-slate-300">
-                        <tr>
-                            <td colspan="4" class="p-4 text-center text-slate-500">Inapakia data kutoka Supabase...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+            <!-- JEDWALI LA KESI -->
+            <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <h2 class="font-cinzel text-lg text-rose-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-list"></i> Orodha ya Kesi za Wanafunzi
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                                <th class="p-3">MWANAFUNZI</th>
+                                <th class="p-3">REG NO</th>
+                                <th class="p-3">AINA YA KESI</th>
+                                <th class="p-3">IDARA</th>
+                                <th class="p-3">STATUS</th>
+                                <th class="p-3">MAELEZO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cases-table-body" class="divide-y divide-slate-800 text-slate-300">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">Inapakia...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= TAB 3: MATANGAZO & POSTER MAKER ================= -->
+        <div id="tab-notices" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- FOMU YA KUTENGENEZA TANGAZO -->
+            <section class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                <h2 class="font-cinzel text-lg text-gold-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square"></i> Andika Tangazo / Notice MPYA
+                </h2>
+                <form id="notice-form" class="space-y-4">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Kichwa cha Tangazo (Heading)</label>
+                        <input type="text" id="notice-title" oninput="updateNoticePreview()" required placeholder="KUMBUKUMBU YA MKUTANO MKUU WA CNMS" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Sekretarieti Inayotoa Tangazo</label>
+                        <input type="text" id="notice-secretariat" oninput="updateNoticePreview()" required placeholder="OFISI YA GAVANA - CNMS" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Mjumbe / Yaliyomo kwenye Tangazo</label>
+                        <textarea id="notice-body" oninput="updateNoticePreview()" rows="5" required placeholder="Tungependa kuwataarifu wanafunzi wote wa CNMS kuwa..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Jina la Mweka Saini</label>
+                            <input type="text" id="notice-signatory-name" oninput="updateNoticePreview()" required placeholder="Paul Elias Mashini" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Cheo cha Mweka Saini</label>
+                            <input type="text" id="notice-signatory-title" oninput="updateNoticePreview()" required placeholder="Gavana - UDOSO CNMS" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-gold-500">
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="button" onclick="downloadPoster()" class="w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-download"></i> Pakua Kama Picha (Poster)
+                        </button>
+                        <button type="submit" class="w-1/2 bg-gold-500 hover:bg-gold-600 text-udom-navy font-bold py-2.5 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Hifadhi Kwenye Database
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- LIVE PREVIEW YA POSTER / TANGAZO -->
+            <section class="space-y-2">
+                <p class="text-xs text-slate-400 flex justify-between items-center">
+                    <span><i class="fa-solid fa-eye"></i> Live Official Poster Preview:</span>
+                    <span class="text-gold-400 font-semibold">Ready to print</span>
+                </p>
+                <div id="notice-poster-card" class="bg-slate-100 text-slate-900 p-8 rounded-xl shadow-2xl border-4 border-gold-500 space-y-6 relative overflow-hidden">
+                    <!-- HEADER BRANDING -->
+                    <div class="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+                        <div class="w-16 h-16 bg-udom-navy text-gold-400 mx-auto rounded-full flex items-center justify-center text-3xl font-bold shadow-lg">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <h2 class="font-cinzel font-extrabold text-sm tracking-wider text-udom-navy mt-2">UNIVERSITY OF DODOMA STUDENT ORGANIZATION</h2>
+                        <h3 class="font-cinzel font-bold text-xs text-slate-700">COLLEGE OF NATURAL AND MATHEMATICAL SCIENCES (CNMS)</h3>
+                        <p id="preview-secretariat" class="text-xs font-semibold text-gold-600 uppercase tracking-widest">OFISI YA GAVANA - CNMS</p>
+                    </div>
+
+                    <!-- KICHWA -->
+                    <div class="text-center space-y-1">
+                        <span class="bg-udom-navy text-white text-[10px] px-3 py-1 uppercase tracking-widest font-bold rounded-full">TANGAZO RASMI</span>
+                        <h1 id="preview-title" class="font-cinzel font-black text-lg text-slate-900 uppercase pt-2">KICHWA CHA TANGAZO HAPA</h1>
+                        <p class="text-[10px] text-slate-500">Tarehe: <span id="preview-date">04/10/2026</span></p>
+                    </div>
+
+                    <!-- YALIYOMO -->
+                    <div class="py-2">
+                        <p id="preview-body" class="text-xs text-slate-800 leading-relaxed whitespace-pre-line text-justify font-medium">
+                            Yaliyomo kwenye tangazo yataonekana hapa moja kwa moja unapokuwa unaandika kwenye fomu upande wa kushoto...
+                        </p>
+                    </div>
+
+                    <!-- SIGNAURE & STAMP AREA -->
+                    <div class="pt-6 flex justify-between items-end border-t border-slate-300">
+                        <!-- DIGITAL STAMP -->
+                        <div class="w-24 h-24 border-2 border-dashed border-gold-600 rounded-full flex flex-col items-center justify-center text-[9px] text-gold-600 font-bold uppercase text-center rotate-[-12deg] bg-amber-500/10 p-1">
+                            <i class="fa-solid fa-stamp text-lg mb-1"></i>
+                            UDOSO CNMS
+                            <span>APPROVED</span>
+                        </div>
+
+                        <!-- SIGNATORY -->
+                        <div class="text-right space-y-1">
+                            <div class="font-serif italic text-slate-600 text-sm border-b border-slate-400 pb-1 px-4">
+                                M. F. Jibulika
+                            </div>
+                            <h4 id="preview-signatory-name" class="font-bold text-xs text-slate-900">Paul Elias Mashini</h4>
+                            <p id="preview-signatory-title" class="text-[10px] text-slate-600 font-semibold">Gavana - UDOSO CNMS</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
 
     </main>
 
-    <!-- SCRIPT YA KUUNGANISHA NA SUPABASE -->
+    <!-- SCRIPT YA SUPABASE & LOGIC -->
     <script>
         const SUPABASE_URL = "https://fimynskqdunwtenwzemx.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpbXluc2txZHVud3Rlbnd6ZW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMDUzMjAsImV4cCI6MjEwNjY4MTMyMH0.I4RNspFwbQvX0YF69kQS-1XJltI6fnAnr9ynGUbzV_M";
@@ -157,71 +341,149 @@
         document.addEventListener('DOMContentLoaded', () => {
             checkConnection();
             loadLeaders();
+            loadCases();
+            loadAnnouncementsCount();
+            document.getElementById('preview-date').innerText = new Date().toLocaleDateString('sw-TZ');
         });
 
+        // TAB SWITCHER
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn bg-slate-800 text-slate-300 hover:text-white px-4 py-2 rounded-lg flex items-center gap-2 transition";
+            });
+            document.getElementById('btn-' + tabId).className = "tab-btn bg-gold-500 text-udom-navy px-4 py-2 rounded-lg flex items-center gap-2 transition font-bold";
+        }
+
+        // DATABASE CONNECTION CHECK
         async function checkConnection() {
             try {
                 const { data, error } = await supabase.from('leaders').select('count', { count: 'exact' });
                 if (error) throw error;
-                
                 const statusDiv = document.getElementById('connection-status');
                 statusDiv.className = "text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full flex items-center gap-2";
                 statusDiv.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Database Imeunganishwa (Live)`;
             } catch (err) {
-                console.error(err);
                 const statusDiv = document.getElementById('connection-status');
                 statusDiv.className = "text-xs bg-rose-500/20 text-rose-300 border border-rose-500/30 px-3 py-1 rounded-full flex items-center gap-2";
                 statusDiv.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span> Hitilafu ya Connection`;
             }
         }
 
+        // 1. LEADERS LOGIC
         async function loadLeaders() {
             const { data, error } = await supabase.from('leaders').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('leaders-table-body');
-            const leaderCount = document.getElementById('count-leaders');
-
-            if (error) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-rose-400">Imeshindikana kupakia data. Check API keys.</td></tr>`;
-                return;
+            if (data) {
+                document.getElementById('count-leaders').innerText = data.length;
+                tbody.innerHTML = data.length === 0 ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Hakuna kiongozi aliyesajiliwa.</td></tr>` :
+                data.map(l => `
+                    <tr class="hover:bg-slate-800/50">
+                        <td class="p-3 font-semibold text-white">${l.full_name}</td>
+                        <td class="p-3">${l.phone}</td>
+                        <td class="p-3 text-gold-400">${l.title}</td>
+                        <td class="p-3">${l.secretariat_code}</td>
+                    </tr>
+                `).join('');
             }
-
-            leaderCount.innerText = data.length;
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">Hakuna kiongozi aliyesajiliwa bado.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = data.map(leader => `
-                <tr class="hover:bg-slate-800/50">
-                    <td class="p-3 font-semibold text-white">${leader.full_name}</td>
-                    <td class="p-3">${leader.phone}</td>
-                    <td class="p-3 text-gold-400">${leader.title}</td>
-                    <td class="p-3">${leader.secretariat_code}</td>
-                </tr>
-            `).join('');
         }
 
         document.getElementById('add-leader-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const fullName = document.getElementById('leader-name').value;
-            const phone = document.getElementById('leader-phone').value;
-            const title = document.getElementById('leader-title').value;
-            const secretariat = document.getElementById('leader-secretariat').value;
-
-            const { error } = await supabase.from('leaders').insert([
-                { full_name: fullName, phone: phone, title: title, secretariat_code: secretariat }
-            ]);
-
-            if (error) {
-                alert("Hitilafu imetokea: " + error.message);
-            } else {
-                alert("Kiongozi amesajiliwa kikamilifu!");
+            const { error } = await supabase.from('leaders').insert([{
+                full_name: document.getElementById('leader-name').value,
+                phone: document.getElementById('leader-phone').value,
+                title: document.getElementById('leader-title').value,
+                secretariat_code: document.getElementById('leader-secretariat').value
+            }]);
+            if (!error) {
+                alert("Kiongozi amesajiliwa!");
                 document.getElementById('add-leader-form').reset();
                 loadLeaders();
             }
         });
+
+        // 2. CASES LOGIC
+        async function loadCases() {
+            const { data, error } = await supabase.from('student_cases').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('cases-table-body');
+            if (data) {
+                document.getElementById('count-cases').innerText = data.length;
+                tbody.innerHTML = data.length === 0 ? `<tr><td colspan="6" class="p-4 text-center text-slate-500">Hakuna kesi iliyosajiliwa.</td></tr>` :
+                data.map(c => `
+                    <tr class="hover:bg-slate-800/50">
+                        <td class="p-3 font-semibold text-white">${c.student_name}</td>
+                        <td class="p-3 text-slate-400">${c.registration_number}</td>
+                        <td class="p-3 text-gold-400 font-medium">${c.issue_type}</td>
+                        <td class="p-3">${c.department}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-1 rounded text-[10px] font-bold ${c.status === 'Resolved' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">
+                                ${c.status}
+                            </span>
+                        </td>
+                        <td class="p-3 text-slate-400 max-w-xs truncate">${c.description}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        document.getElementById('add-case-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const { error } = await supabase.from('student_cases').insert([{
+                student_name: document.getElementById('case-student-name').value,
+                registration_number: document.getElementById('case-reg-no').value,
+                issue_type: document.getElementById('case-type').value,
+                department: document.getElementById('case-department').value,
+                status: document.getElementById('case-status').value,
+                description: document.getElementById('case-description').value
+            }]);
+            if (!error) {
+                alert("Kesi ya mwanafunzi imesajiliwa!");
+                document.getElementById('add-case-form').reset();
+                loadCases();
+            }
+        });
+
+        // 3. NOTICE & POSTER LOGIC
+        function updateNoticePreview() {
+            document.getElementById('preview-title').innerText = document.getElementById('notice-title').value || "KICHWA CHA TANGAZO HAPA";
+            document.getElementById('preview-secretariat').innerText = document.getElementById('notice-secretariat').value || "OFISI YA GAVANA - CNMS";
+            document.getElementById('preview-body').innerText = document.getElementById('notice-body').value || "Yaliyomo kwenye tangazo...";
+            document.getElementById('preview-signatory-name').innerText = document.getElementById('notice-signatory-name').value || "Paul Elias Mashini";
+            document.getElementById('preview-signatory-title').innerText = document.getElementById('notice-signatory-title').value || "Gavana - UDOSO CNMS";
+        }
+
+        async function loadAnnouncementsCount() {
+            const { data } = await supabase.from('announcements').select('*');
+            if (data) document.getElementById('count-announcements').innerText = data.length;
+        }
+
+        document.getElementById('notice-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const { error } = await supabase.from('announcements').insert([{
+                title: document.getElementById('notice-title').value,
+                secretariat_code: document.getElementById('notice-secretariat').value,
+                content: document.getElementById('notice-body').value,
+                signatory_name: document.getElementById('notice-signatory-name').value,
+                signatory_title: document.getElementById('notice-signatory-title').value
+            }]);
+            if (!error) {
+                alert("Tangazo limehifadhiwa kwenye Database!");
+                loadAnnouncementsCount();
+            }
+        });
+
+        function downloadPoster() {
+            const card = document.getElementById('notice-poster-card');
+            html2canvas(card, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'UDOSO-CNMS-Notice.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
     </script>
 </body>
 </html>
